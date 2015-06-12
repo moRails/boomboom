@@ -6,6 +6,7 @@
 #include "ofxOsc.h"
 #include "ofxBox2d.h"
 #include "ofxKinect.h"
+#include "ofxOpenCv.h"
 
 // listen on port 12345
 #define PORT 12345
@@ -50,5 +51,13 @@ class ofApp : public ofBaseApp{
     
     ofxKinect kinect;
     int angle;
+    
+    ofxCvColorImage colorImg;
+	
+	ofxCvGrayscaleImage grayImage; // grayscale depth image
+	ofxCvGrayscaleImage grayThreshNear; // the near thresholded image
+	ofxCvGrayscaleImage grayThreshFar; // the far thresholded image
+	
+	ofxCvContourFinder contourFinder;
 		
 };
