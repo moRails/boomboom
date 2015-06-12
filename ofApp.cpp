@@ -20,12 +20,40 @@ void ofApp::setup(){
 	box2d.setGravity(0, 30);
 	box2d.createGround();
 	box2d.setFPS(60.0);
+    
+    //-- Kinect
+    // enable depth->video image calibration
+	kinect.setRegistration(true);
+    
+	kinect.init();
+	//kinect.init(true); // shows infrared instead of RGB video image
+	//kinect.init(false, false); // disable video image (faster fps)
+	
+	kinect.open();		// opens first available kinect
+	//kinect.open(1);	// open a kinect by id, starting with 0 (sorted by serial # lexicographically))
+	//kinect.open("A00362A08602047A");	// open a kinect using it's unique serial #
+	
+	// print the intrinsic IR sensor values
+	if(kinect.isConnected()) {
+		ofLogNotice() << "sensor-emitter dist: " << kinect.getSensorEmitterDistance() << "cm";
+		ofLogNotice() << "sensor-camera dist:  " << kinect.getSensorCameraDistance() << "cm";
+		ofLogNotice() << "zero plane pixel size: " << kinect.getZeroPlanePixelSize() << "mm";
+		ofLogNotice() << "zero plane dist: " << kinect.getZeroPlaneDistance() << "mm";
+	}
+    
+    // zero the tilt on startup
+	angle = 0;
+	kinect.setCameraTiltAngle(angle);
+
+
 
 }
 
 //--------------------------------------------------------------
 void ofApp::update()
 {
+    //------------------------------------------------------------------->  this is KINECT
+    kinect.update();
     //------------------------------------------------------------------->  this is BOX2D
     // add some circles every so often
 	if((int)ofRandom(0, 10) == 0) {
@@ -103,6 +131,11 @@ void ofApp::update()
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+    
+    //------------------------------------------------------------------->  this is KINECT
+    // draw from the live kinect
+    kinect.drawDepth(10, 10, 400, 300);
+    kinect.draw(420, 10, 400, 300);
     
     //------------------------------------------------------------------->  this is BOX2D
     // some circles :)

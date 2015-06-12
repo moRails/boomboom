@@ -5,6 +5,8 @@
 #include "ofxGui.h"
 #include "ofxOsc.h"
 #include "ofxBox2d.h"
+#include "ofxKinect.h"
+
 // listen on port 12345
 #define PORT 12345
 #define NUM_MSG_STRINGS 20
@@ -45,5 +47,8 @@ class ofApp : public ofBaseApp{
 	ofxBox2d                            box2d;
 	vector <shared_ptr<ofxBox2dCircle> >		circles;
 	vector <shared_ptr<ofxBox2dEdge> >       edges;
+    
+    ofxKinect kinect;
+    int angle;
 		
 };
