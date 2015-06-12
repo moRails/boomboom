@@ -2,7 +2,10 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    mainOutputSyphonServer.setName("Screen Output");
+    mainOutputSyphonServer.setName("boomboomOUT");
+    
+    gui.setup(); // most of the time you don't need a name
+    gui.add(radius.setup( "radius", 140, 10, 300 ));
 
 }
 
@@ -13,8 +16,10 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    ofCircle(mouseX, mouseY, 100);
+    ofCircle(mouseX, mouseY, radius);
     mainOutputSyphonServer.publishScreen();
+    
+    gui.draw();
 }
 
 //--------------------------------------------------------------

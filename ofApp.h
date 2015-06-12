@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 #include "ofxSyphon.h"
+#include "ofxGui.h"
 
 class ofApp : public ofBaseApp{
 
@@ -24,8 +25,8 @@ class ofApp : public ofBaseApp{
     ofTexture tex;
     
 	ofxSyphonServer mainOutputSyphonServer;
-	ofxSyphonServer individualTextureSyphonServer;
-	
-	ofxSyphonClient mClient;
+    
+    ofxFloatSlider radius;
+    ofxPanel gui;
 		
 };
