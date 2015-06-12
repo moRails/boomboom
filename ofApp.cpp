@@ -2,20 +2,42 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+   
+    //-- SYPHON
+    mainOutputSyphonServer.setName("boomboomOUT");
+    
+    //-- GUI
+    gui.setup(); // most of the time you don't need a name
+    gui.add(radius.setup( "radius", 140, 10, 300 ));
+    
+    //-- OSC
     cout << "listening for osc messages on port " << PORT << "\n";
 	receiver.setup(PORT);
     current_msg_string = 0;
     
-    mainOutputSyphonServer.setName("boomboomOUT");
-    
-    gui.setup(); // most of the time you don't need a name
-    gui.add(radius.setup( "radius", 140, 10, 300 ));
+    //-- Box2d
+	box2d.init();
+	box2d.setGravity(0, 30);
+	box2d.createGround();
+	box2d.setFPS(60.0);
 
 }
 
 //--------------------------------------------------------------
 void ofApp::update()
 {
+    //------------------------------------------------------------------->  this is BOX2D
+    // add some circles every so often
+	if((int)ofRandom(0, 10) == 0) {
+		shared_ptr<ofxBox2dCircle> c = shared_ptr<ofxBox2dCircle>(new ofxBox2dCircle);
+		c.get()->setPhysics(0.2, 0.2, 0.002);
+		c.get()->setup(box2d.getWorld(), ofRandom(20, 50), -20, ofRandom(3, 10));
+        c.get()->setVelocity(0, 15); // shoot them down!
+		circles.push_back(c);
+	}
+	
+	box2d.update();
+    
     //------------------------------------------------------------------->  this is OSC messager
 	
 	// hide old messages
@@ -81,14 +103,40 @@ void ofApp::update()
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    ofCircle(mouseX, mouseY, radius);
-    mainOutputSyphonServer.publishScreen();
     
+    //------------------------------------------------------------------->  this is BOX2D
+    // some circles :)
+	for (int i=0; i<circles.size(); i++) {
+		ofFill();
+		ofSetHexColor(0xc0dd3b);
+		circles[i].get()->draw();
+	}
+	
+	ofSetHexColor(0x444342);
+	ofNoFill();
+	for (int i=0; i<lines.size(); i++) {
+		lines[i].draw();
+	}
+	for (int i=0; i<edges.size(); i++) {
+		edges[i].get()->draw();
+	}
+
+    ofCircle(mouseX, mouseY, radius);
+    //------------------------------------------------------------------->  this is SYPHON
+    mainOutputSyphonServer.publishScreen();
+    //------------------------------------------------------------------->  this is GUI
     gui.draw();
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
+    
+    //------------------------------------------------------------------->  this is BOX2D
+    if(key == 'c') {
+		lines.clear();
+		edges.clear();
+	}
+
 
 }
 
@@ -104,16 +152,32 @@ void ofApp::mouseMoved(int x, int y ){
 
 //--------------------------------------------------------------
 void ofApp::mouseDragged(int x, int y, int button){
-
+    //------------------------------------------------------------------->  this is BOX2D
+    lines.back().addVertex(x, y);
 }
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
-
+    //------------------------------------------------------------------->  this is BOX2D
+    lines.push_back(ofPolyline());
+	lines.back().addVertex(x, y);
 }
 
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
+    //------------------------------------------------------------------->  this is BOX2D
+    shared_ptr <ofxBox2dEdge> edge = shared_ptr<ofxBox2dEdge>(new ofxBox2dEdge);
+	lines.back().simplify();
+	
+	for (int i=0; i<lines.back().size(); i++) {
+		edge.get()->addVertex(lines.back()[i]);
+	}
+	
+	//poly.setPhysics(1, .2, 1);  // uncomment this to see it fall!
+	edge.get()->create(box2d.getWorld());
+	edges.push_back(edge);
+	
+	//lines.clear();
 
 }
 
