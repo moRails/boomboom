@@ -18,6 +18,7 @@ class ofApp : public ofBaseApp{
 		void setup();
 		void update();
 		void draw();
+        void exit();
 
 		void keyPressed(int key);
 		void keyReleased(int key);
@@ -29,29 +30,30 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
     
-    
+    //------------------------------------------------------------------->  this is SYPHON
     ofTexture tex;
     
 	ofxSyphonServer mainOutputSyphonServer;
-    
+    //------------------------------------------------------------------->  this is GUI
     ofxFloatSlider radius;
+    ofxFloatSlider distMax, distMin;
     ofxPanel gui;
-    
+    //------------------------------------------------------------------->  this is OSC
     ofxOscReceiver receiver;
     int current_msg_string;
     string msg_strings[NUM_MSG_STRINGS];
     float timers[NUM_MSG_STRINGS];
     string oscMessage;
 	float oscValue;
-    
+    //------------------------------------------------------------------->  this is BOX2D
     vector <ofPolyline>                 lines;
 	ofxBox2d                            box2d;
 	vector <shared_ptr<ofxBox2dCircle> >		circles;
 	vector <shared_ptr<ofxBox2dEdge> >       edges;
-    
+    //------------------------------------------------------------------->  this is KINECT
     ofxKinect kinect;
     int angle;
-    
+    //------------------------------------------------------------------->  this is OPEN CV
     ofxCvColorImage colorImg;
 	
 	ofxCvGrayscaleImage grayImage; // grayscale depth image
@@ -59,5 +61,9 @@ class ofApp : public ofBaseApp{
 	ofxCvGrayscaleImage grayThreshFar; // the far thresholded image
 	
 	ofxCvContourFinder contourFinder;
+    
+    
+    ofImage monImage;
+    ofFbo fbo;
 		
 };

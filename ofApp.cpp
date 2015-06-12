@@ -9,6 +9,8 @@ void ofApp::setup(){
     //-- GUI
     gui.setup(); // most of the time you don't need a name
     gui.add(radius.setup( "radius", 140, 10, 300 ));
+    gui.add(distMax.setup( "distMax", 1500, 200, 8000 ));
+    gui.add(distMin.setup( "distMin", 200, 100, 7500 ));
     
     //-- OSC
     cout << "listening for osc messages on port " << PORT << "\n";
@@ -44,6 +46,8 @@ void ofApp::setup(){
     // zero the tilt on startup
 	angle = 0;
 	kinect.setCameraTiltAngle(angle);
+    
+    monImage.loadImage ("monImage.png");
 
 
 
@@ -54,6 +58,32 @@ void ofApp::update()
 {
     //------------------------------------------------------------------->  this is KINECT
     kinect.update();
+    if(kinect.isFrameNew())
+	{
+		int maDistance;
+		for (int i=0;i< kinect.getWidth();i++)
+		{
+			for (int j=0;j< kinect.getHeight();j++)
+			{
+				maDistance = kinect.getDistanceAt(i,j);
+				if (maDistance > distMax || maDistance < distMin )
+				{
+					ofColor myColor;
+					myColor.set(0, 0, 0);
+					monImage.setColor(i, j, myColor);
+				}
+				else
+				{
+                    ofColor myColor;
+					myColor.set(255, 255, 255);
+					monImage.setColor(i, j, myColor);
+
+					
+				}
+			}
+		}
+        monImage.update();
+    }
     //------------------------------------------------------------------->  this is BOX2D
     // add some circles every so often
 	if((int)ofRandom(0, 10) == 0) {
@@ -134,8 +164,15 @@ void ofApp::draw(){
     
     //------------------------------------------------------------------->  this is KINECT
     // draw from the live kinect
-    kinect.drawDepth(10, 10, 400, 300);
-    kinect.draw(420, 10, 400, 300);
+    kinect.drawDepth(220, 10, 200, 150);
+    kinect.draw(440, 10, 200, 150);
+    
+    fbo.begin();
+    {
+        monImage.draw(0,200, 640, 480);
+    }
+    fbo.end();
+    fbo.draw( 0, 0 );
     
     //------------------------------------------------------------------->  this is BOX2D
     // some circles :)
@@ -161,6 +198,17 @@ void ofApp::draw(){
     gui.draw();
 }
 
+
+//--------------------------------------------------------------
+void ofApp::exit() {
+	kinect.setCameraTiltAngle(0); // zero the tilt on exit
+	kinect.close();
+	
+#ifdef USE_TWO_KINECTS
+	kinect2.close();
+#endif
+}
+
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     
@@ -169,6 +217,14 @@ void ofApp::keyPressed(int key){
 		lines.clear();
 		edges.clear();
 	}
+    
+    switch (key) {
+        case 'w':
+			kinect.enableDepthNearValueWhite(!kinect.isDepthNearValueWhite());
+			break;
+			
+	}
+
 
 
 }
