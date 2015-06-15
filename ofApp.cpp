@@ -24,7 +24,7 @@ void ofApp::setup(){
     gui.add(colorGreen.setup( "colorGreen",  0, 0, 255));
     gui.add(colorBlue.setup ( "colorBlue",   0, 0, 255));
     gui.setPosition(widthOfTheWindow - 220, 300);
-    gui.setWidthElements(340);
+    //gui.setWidthElements(340);
     
     //-- OSC
     cout << "listening for osc messages on port " << PORT << "\n";
