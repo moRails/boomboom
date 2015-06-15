@@ -3,23 +3,29 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     
+    ofBackground(0, 0, 0);
     widthOfTheWindow  = ofGetWindowWidth();
     heightOfTheWindow = ofGetWindowHeight();
     
     //-- SYPHON
     mainOutputSyphonServer.setName("boomboomOUT");
-    
+    toProject.setName("justWhatWeNeed");
+    tex.allocate(640, 480, GL_RGBA);
     //-- GUI
     gui.setup(); // most of the time you don't need a name
     gui.add(distMax.setup( "distMax", 1500, 200, 8000 ));
     gui.add(distMin.setup( "distMin", 200, 100, 7500 ));
-    gui.add(simplification.setup( "simplification", 1.8, 0.0, 3.0));
+    gui.add(simplification.setup( "simplification", 1.8, 0.0, 5.0));
+    gui.add(holeSizeMin.setup("holeSizeMin", 20,20,300));
     gui.add(showShape.setup("showShape", true));
     gui.add(showImage.setup("showImage", false));
     gui.add(showLines.setup("showlines", false));
     gui.add(colorRed.setup  ( "colorRed",  200, 0, 255));
     gui.add(colorGreen.setup( "colorGreen",  0, 0, 255));
     gui.add(colorBlue.setup ( "colorBlue",   0, 0, 255));
+    gui.setPosition(widthOfTheWindow - 220, 300);
+    gui.setWidthElements(340);
+    
     //-- OSC
     cout << "listening for osc messages on port " << PORT << "\n";
 	receiver.setup(PORT);
@@ -107,12 +113,6 @@ void ofApp::update()
         
         colorImg.setFromPixels(monImage.getPixels(), 640,480);
         grayImage = colorImg;
-		/*if (bLearnBakground == true)
-        {
-            colorImg.setFromPixels(myBackground.getPixels(), 640,480);
-			//grayBg = grayImage;		// the = sign copys the pixels from grayImage into grayBg (operator overloading)
-			bLearnBakground = false;
-		}*/
         
 		// take the abs value of the difference between background and incoming and then threshold:
 		grayDiff.absDiff(grayBg, grayImage);
@@ -120,7 +120,7 @@ void ofApp::update()
         
 		// find contours which are between the size of 20 pixels and 1/3 the w*h pixels.
 		// also, find holes is set to true so we will get interior contours as well....
-		contourFinder.findContours(grayDiff, 20, (640*480)/3, 10, true);	// find holes
+		contourFinder.findContours(grayDiff, holeSizeMin, (640*480)/3, 10, true);	// find holes
         
         if(contourFinder.blobs.size() > 0)
         {
@@ -266,9 +266,6 @@ void ofApp::draw()
         }
     }
 	
-    //------------------------------------------------------------------->  this is SYPHON
-    mainOutputSyphonServer.publishScreen();
-    
     //------------------------------------------------------------------->  this is MY SHAPE
     if(showShape)
     {
@@ -284,6 +281,13 @@ void ofApp::draw()
         }
     }
 
+    
+    //------------------------------------------------------------------->  this is SYPHON
+    tex.loadScreenData(20, 160, 640, 480); // loading only the interesting part
+    
+    mainOutputSyphonServer.publishScreen();
+    toProject.publishTexture(&tex);
+    
     //------------------------------------------------------------------->  this is GUI
     gui.draw();
     // finally, a report:
@@ -293,7 +297,7 @@ void ofApp::draw()
     << "press ' ' to capture bg" << endl
     << "threshold " << threshold << " (press: +/-)" << endl
     << "num blobs found " << contourFinder.nBlobs << ", fps: " << ofGetFrameRate();
-	ofDrawBitmapString(reportStr.str(), widthOfTheWindow - (180 *2), 360);
+	ofDrawBitmapString(reportStr.str(), 20, heightOfTheWindow - 50);
 
 }
 

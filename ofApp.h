@@ -34,10 +34,11 @@ class ofApp : public ofBaseApp{
     ofTexture tex;
     
 	ofxSyphonServer mainOutputSyphonServer;
+    ofxSyphonServer toProject;
     //------------------------------------------------------------------->  this is GUI
     ofxFloatSlider radius;
     ofxFloatSlider distMax, distMin, simplification;
-    ofxIntSlider colorRed, colorGreen, colorBlue;
+    ofxIntSlider colorRed, colorGreen, colorBlue, holeSizeMin;
     ofxToggle showImage;
     ofxToggle showShape;
     ofxToggle showLines;
