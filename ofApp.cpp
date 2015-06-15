@@ -2,16 +2,17 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+    
+    widthOfTheWindow  = ofGetWindowWidth();
+    heightOfTheWindow = ofGetWindowHeight();
    
     //-- SYPHON
     mainOutputSyphonServer.setName("boomboomOUT");
     
     //-- GUI
     gui.setup(); // most of the time you don't need a name
-    gui.add(radius.setup( "radius", 140, 10, 300 ));
     gui.add(distMax.setup( "distMax", 1500, 200, 8000 ));
     gui.add(distMin.setup( "distMin", 200, 100, 7500 ));
-    
     //-- OSC
     cout << "listening for osc messages on port " << PORT << "\n";
 	receiver.setup(PORT);
@@ -21,7 +22,7 @@ void ofApp::setup(){
 	box2d.init();
 	box2d.setGravity(0, 30);
 	box2d.createGround();
-	box2d.setFPS(60.0);
+	box2d.setFPS(30.0);
     
     //-- Kinect
     // enable depth->video image calibration
@@ -47,10 +48,23 @@ void ofApp::setup(){
 	angle = 0;
 	kinect.setCameraTiltAngle(angle);
     
+    //-- OPEN CV
+    colorImg.allocate(640,480);
+	grayImage.allocate(640,480);
+	grayBg.allocate(640,480);
+	grayDiff.allocate(640,480);
+    
+    bLearnBakground = true;
+	threshold = 30;
+
+    
+    
     monImage.loadImage ("monImage.png");
-
-
-
+    myBackground.loadImage("myBackground.png");
+    colorImg.setFromPixels(myBackground.getPixels(), 640,480);
+    
+    showGui = true;
+    showImage = true;
 }
 
 //--------------------------------------------------------------
@@ -78,18 +92,61 @@ void ofApp::update()
 					myColor.set(255, 255, 255);
 					monImage.setColor(i, j, myColor);
 
-					
 				}
 			}
 		}
         monImage.update();
+        
+        colorImg.setFromPixels(monImage.getPixels(), 640,480);
+        grayImage = colorImg;
+		/*if (bLearnBakground == true)
+        {
+            colorImg.setFromPixels(myBackground.getPixels(), 640,480);
+			//grayBg = grayImage;		// the = sign copys the pixels from grayImage into grayBg (operator overloading)
+			bLearnBakground = false;
+		}*/
+        
+		// take the abs value of the difference between background and incoming and then threshold:
+		grayDiff.absDiff(grayBg, grayImage);
+		grayDiff.threshold(threshold);
+        
+		// find contours which are between the size of 20 pixels and 1/3 the w*h pixels.
+		// also, find holes is set to true so we will get interior contours as well....
+		contourFinder.findContours(grayDiff, 20, (640*480)/3, 10, true);	// find holes
+        lines.clear();
+        edges.clear();
+        if(contourFinder.blobs.size() > 0)
+        {
+            
+            for( int i=0; i<(int)contourFinder.blobs.size(); i++ )
+            {
+                //ofNoFill();
+                lines.push_back(ofPolyline());
+                for( int j=0; j<contourFinder.blobs[i].nPts; j++ )
+                {
+                    lines.back().addVertex( 20 + contourFinder.blobs[i].pts[j].x, 160 + contourFinder.blobs[i].pts[j].y );
+                }
+                shared_ptr <ofxBox2dEdge> edge = shared_ptr<ofxBox2dEdge>(new ofxBox2dEdge);
+                lines.back().simplify();
+                for (int i=0; i<lines.back().size(); i++)
+                {
+                    edge.get()->addVertex(lines.back()[i]);
+                }
+                
+                //poly.setPhysics(1, .2, 1);  // uncomment this to see it fall!
+                edge.get()->create(box2d.getWorld());
+                edges.push_back(edge);
+            }
+
+    }
     }
     //------------------------------------------------------------------->  this is BOX2D
     // add some circles every so often
-	if((int)ofRandom(0, 10) == 0) {
+	if((int)ofRandom(0, 10) == 0)
+    {
 		shared_ptr<ofxBox2dCircle> c = shared_ptr<ofxBox2dCircle>(new ofxBox2dCircle);
 		c.get()->setPhysics(0.2, 0.2, 0.002);
-		c.get()->setup(box2d.getWorld(), ofRandom(20, 50), -20, ofRandom(3, 10));
+		c.get()->setup(box2d.getWorld(), ofRandom(20, 500), -20, ofRandom(50, 100));
         c.get()->setVelocity(0, 15); // shoot them down!
 		circles.push_back(c);
 	}
@@ -160,20 +217,34 @@ void ofApp::update()
 }
 
 //--------------------------------------------------------------
-void ofApp::draw(){
+void ofApp::draw()
+{
+    ofSetColor(50);
+    ofFill();
+    ofRect(widthOfTheWindow - 400, 0, widthOfTheWindow, heightOfTheWindow);
+    ofSetColor(255);
+    //------------------------------------------------------------------->  this is OPEN CV
+    //colorImg.draw(     widthOfTheWindow - 180, 20,  160, 120);
+	//grayImage.draw(    widthOfTheWindow - 180, 160, 160, 120);
+	grayBg.draw(       widthOfTheWindow - 180, 20, 160, 120);
+	grayDiff.draw(     widthOfTheWindow - 180, 160, 160, 120);
+    contourFinder.draw(widthOfTheWindow - (180 *2), 300, 160, 120);
     
     //------------------------------------------------------------------->  this is KINECT
     // draw from the live kinect
-    kinect.drawDepth(220, 10, 200, 150);
-    kinect.draw(440, 10, 200, 150);
+    kinect.drawDepth(  widthOfTheWindow - (180 *2), 20, 160, 120);
+    kinect.draw(       widthOfTheWindow - (180 *2), 160, 160, 120);
     
-    fbo.begin();
+    if(showImage)
     {
-        monImage.draw(0,200, 640, 480);
+        fbo.begin();
+        {
+            monImage.draw(20,160, 640, 480);
+        }
+        fbo.end();
+        fbo.draw( 0, 0 );
     }
-    fbo.end();
-    fbo.draw( 0, 0 );
-    
+
     //------------------------------------------------------------------->  this is BOX2D
     // some circles :)
 	for (int i=0; i<circles.size(); i++) {
@@ -191,11 +262,34 @@ void ofApp::draw(){
 		edges[i].get()->draw();
 	}
 
-    ofCircle(mouseX, mouseY, radius);
     //------------------------------------------------------------------->  this is SYPHON
     mainOutputSyphonServer.publishScreen();
+    
+    //------------------------------------------------------------------->  this is MY SHAPE
+    /*ofBeginShape();
+    for( int i=0; i<(int)contourFinder.blobs.size(); i++ )
+    {
+		//ofNoFill();
+        ofSetHexColor(0x444342);
+		for( int j=0; j<contourFinder.blobs[i].nPts; j++ )
+        {
+			ofVertex(contourFinder.blobs[i].pts[j].x, 200 + contourFinder.blobs[i].pts[j].y );
+        }
+		ofEndShape();
+        
+	}*/
+
     //------------------------------------------------------------------->  this is GUI
     gui.draw();
+    // finally, a report:
+	ofSetHexColor(0xffffff);
+	stringstream reportStr;
+	reportStr << "bg subtraction and blob detection" << endl
+    << "press ' ' to capture bg" << endl
+    << "threshold " << threshold << " (press: +/-)" << endl
+    << "num blobs found " << contourFinder.nBlobs << ", fps: " << ofGetFrameRate();
+	ofDrawBitmapString(reportStr.str(), widthOfTheWindow - (180 *2), 460);
+
 }
 
 
@@ -204,29 +298,32 @@ void ofApp::exit() {
 	kinect.setCameraTiltAngle(0); // zero the tilt on exit
 	kinect.close();
 	
-#ifdef USE_TWO_KINECTS
-	kinect2.close();
-#endif
+    #ifdef USE_TWO_KINECTS
+        kinect2.close();
+    #endif
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     
     //------------------------------------------------------------------->  this is BOX2D
-    if(key == 'c') {
-		lines.clear();
-		edges.clear();
+    if(key == 'c')
+    {
+        lines.clear();
+        edges.clear();
+        circles.clear();
 	}
     
-    switch (key) {
+    switch (key)
+    {
         case 'w':
 			kinect.enableDepthNearValueWhite(!kinect.isDepthNearValueWhite());
-			break;
-			
+        break;
+            
+        case 'b':
+            showImage =! showImage;
+        break;
 	}
-
-
-
 }
 
 //--------------------------------------------------------------
@@ -241,33 +338,16 @@ void ofApp::mouseMoved(int x, int y ){
 
 //--------------------------------------------------------------
 void ofApp::mouseDragged(int x, int y, int button){
-    //------------------------------------------------------------------->  this is BOX2D
-    lines.back().addVertex(x, y);
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
-    //------------------------------------------------------------------->  this is BOX2D
-    lines.push_back(ofPolyline());
-	lines.back().addVertex(x, y);
+
 }
 
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
-    //------------------------------------------------------------------->  this is BOX2D
-    shared_ptr <ofxBox2dEdge> edge = shared_ptr<ofxBox2dEdge>(new ofxBox2dEdge);
-	lines.back().simplify();
-	
-	for (int i=0; i<lines.back().size(); i++) {
-		edge.get()->addVertex(lines.back()[i]);
-	}
-	
-	//poly.setPhysics(1, .2, 1);  // uncomment this to see it fall!
-	edge.get()->create(box2d.getWorld());
-	edges.push_back(edge);
-	
-	//lines.clear();
-
 }
 
 //--------------------------------------------------------------

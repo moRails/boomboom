@@ -37,6 +37,7 @@ class ofApp : public ofBaseApp{
     //------------------------------------------------------------------->  this is GUI
     ofxFloatSlider radius;
     ofxFloatSlider distMax, distMin;
+    ofxButton showMyImage;
     ofxPanel gui;
     //------------------------------------------------------------------->  this is OSC
     ofxOscReceiver receiver;
@@ -57,13 +58,20 @@ class ofApp : public ofBaseApp{
     ofxCvColorImage colorImg;
 	
 	ofxCvGrayscaleImage grayImage; // grayscale depth image
+    ofxCvGrayscaleImage grayBg;
 	ofxCvGrayscaleImage grayThreshNear; // the near thresholded image
 	ofxCvGrayscaleImage grayThreshFar; // the far thresholded image
-	
-	ofxCvContourFinder contourFinder;
+	ofxCvGrayscaleImage grayDiff;
+    
+	ofxCvContourFinder  contourFinder;
+    int 				threshold;
+    bool				bLearnBakground;
     
     
-    ofImage monImage;
+    ofImage monImage, myBackground;
     ofFbo fbo;
+    ofMesh myMesh;
+    int widthOfTheWindow, heightOfTheWindow;
+    bool showGui, showImage;
 		
 };
