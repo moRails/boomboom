@@ -36,7 +36,8 @@ class ofApp : public ofBaseApp{
 	ofxSyphonServer mainOutputSyphonServer;
     //------------------------------------------------------------------->  this is GUI
     ofxFloatSlider radius;
-    ofxFloatSlider distMax, distMin;
+    ofxFloatSlider distMax, distMin, simplification;
+    ofxIntSlider colorRed, colorGreen, colorBlue;
     ofxToggle showImage;
     ofxToggle showShape;
     ofxToggle showLines;

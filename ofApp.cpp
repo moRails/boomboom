@@ -13,9 +13,13 @@ void ofApp::setup(){
     gui.setup(); // most of the time you don't need a name
     gui.add(distMax.setup( "distMax", 1500, 200, 8000 ));
     gui.add(distMin.setup( "distMin", 200, 100, 7500 ));
+    gui.add(simplification.setup( "simplification", 1.8, 0.0, 3.0));
     gui.add(showShape.setup("showShape", true));
     gui.add(showImage.setup("showImage", false));
     gui.add(showLines.setup("showlines", false));
+    gui.add(colorRed.setup  ( "colorRed",  200, 0, 255));
+    gui.add(colorGreen.setup( "colorGreen",  0, 0, 255));
+    gui.add(colorBlue.setup ( "colorBlue",   0, 0, 255));
     //-- OSC
     cout << "listening for osc messages on port " << PORT << "\n";
 	receiver.setup(PORT);
@@ -123,14 +127,13 @@ void ofApp::update()
             
             for( int i=0; i<(int)contourFinder.blobs.size(); i++ )
             {
-                //ofNoFill();
                 lines.push_back(ofPolyline());
                 for( int j=0; j<contourFinder.blobs[i].nPts; j++ )
                 {
                     lines.back().addVertex( 20 + contourFinder.blobs[i].pts[j].x, 160 + contourFinder.blobs[i].pts[j].y );
                 }
                 shared_ptr <ofxBox2dEdge> edge = shared_ptr<ofxBox2dEdge>(new ofxBox2dEdge);
-                lines.back().simplify(1.8);
+                lines.back().simplify(simplification);
                 for (int i=0; i<lines.back().size(); i++)
                 {
                     edge.get()->addVertex(lines.back()[i]);
@@ -227,11 +230,9 @@ void ofApp::draw()
     ofRect(widthOfTheWindow - 400, 0, widthOfTheWindow, heightOfTheWindow);
     ofSetColor(255);
     //------------------------------------------------------------------->  this is OPEN CV
-    //colorImg.draw(     widthOfTheWindow - 180, 20,  160, 120);
-	//grayImage.draw(    widthOfTheWindow - 180, 160, 160, 120);
 	grayBg.draw(       widthOfTheWindow - 180, 20, 160, 120);
-	grayDiff.draw(     widthOfTheWindow - 180, 160, 160, 120);
-    contourFinder.draw(widthOfTheWindow - (180 *2), 300, 160, 120);
+	grayDiff.draw(     widthOfTheWindow - 180, 160,160, 120);
+    contourFinder.draw(widthOfTheWindow - 180, 20, 160, 120);
     
     //------------------------------------------------------------------->  this is KINECT
     // draw from the live kinect
@@ -243,7 +244,7 @@ void ofApp::draw()
     {
         fbo.begin();
         {
-            monImage.draw(20,160, 640, 480);
+            monImage.draw(20,160);
         }
         fbo.end();
         fbo.draw( 0, 0 );
@@ -258,7 +259,7 @@ void ofApp::draw()
 	}
     if (showLines)
     {
-        ofSetHexColor(0xFF0000);
+        ofSetColor(colorRed, colorGreen, colorBlue);
         for (int i=0; i<lines.size(); i++)
         {
             lines[i].draw();
@@ -273,7 +274,7 @@ void ofApp::draw()
     {
         for( int i=0; i<(int)contourFinder.blobs.size(); i++ )
         {
-            ofSetHexColor(0xFF0000);
+            ofSetColor(colorRed, colorGreen, colorBlue);
             ofBeginShape();
             for( int j=0; j<contourFinder.blobs[i].nPts; j++ )
             {
@@ -292,7 +293,7 @@ void ofApp::draw()
     << "press ' ' to capture bg" << endl
     << "threshold " << threshold << " (press: +/-)" << endl
     << "num blobs found " << contourFinder.nBlobs << ", fps: " << ofGetFrameRate();
-	ofDrawBitmapString(reportStr.str(), widthOfTheWindow - (180 *2), 460);
+	ofDrawBitmapString(reportStr.str(), widthOfTheWindow - (180 *2), 360);
 
 }
 
