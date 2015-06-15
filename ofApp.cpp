@@ -13,6 +13,9 @@ void ofApp::setup(){
     gui.setup(); // most of the time you don't need a name
     gui.add(distMax.setup( "distMax", 1500, 200, 8000 ));
     gui.add(distMin.setup( "distMin", 200, 100, 7500 ));
+    gui.add(showShape.setup("showShape", true));
+    gui.add(showImage.setup("showImage", false));
+    gui.add(showLines.setup("showlines", false));
     //-- OSC
     cout << "listening for osc messages on port " << PORT << "\n";
 	receiver.setup(PORT);
@@ -57,14 +60,12 @@ void ofApp::setup(){
     bLearnBakground = true;
 	threshold = 30;
 
-    
-    
     monImage.loadImage ("monImage.png");
     myBackground.loadImage("myBackground.png");
+    fond.loadImage("fond.jpg");
     colorImg.setFromPixels(myBackground.getPixels(), 640,480);
     
     showGui = true;
-    showImage = true;
 }
 
 //--------------------------------------------------------------
@@ -94,6 +95,9 @@ void ofApp::update()
 				}
 			}
 		}
+        lines.clear();
+        edges.clear();
+        
         monImage.mirror(false, true);
         monImage.update();
         
@@ -113,8 +117,7 @@ void ofApp::update()
 		// find contours which are between the size of 20 pixels and 1/3 the w*h pixels.
 		// also, find holes is set to true so we will get interior contours as well....
 		contourFinder.findContours(grayDiff, 20, (640*480)/3, 10, true);	// find holes
-        lines.clear();
-        edges.clear();
+        
         if(contourFinder.blobs.size() > 0)
         {
             
@@ -235,6 +238,7 @@ void ofApp::draw()
     kinect.drawDepth(  widthOfTheWindow - (180 *2), 20, 160, 120);
     kinect.draw(       widthOfTheWindow - (180 *2), 160, 160, 120);
     
+    fond.draw(20, 160);
     if(showImage)
     {
         fbo.begin();
@@ -252,32 +256,32 @@ void ofApp::draw()
 		ofSetHexColor(0xc0dd3b);
 		circles[i].get()->draw();
 	}
+    if (showLines)
+    {
+        ofSetHexColor(0xFF0000);
+        for (int i=0; i<lines.size(); i++)
+        {
+            lines[i].draw();
+        }
+    }
 	
-	ofSetHexColor(0x444342);
-	ofNoFill();
-	for (int i=0; i<lines.size(); i++) {
-		lines[i].draw();
-	}
-	for (int i=0; i<edges.size(); i++) {
-		edges[i].get()->draw();
-	}
-
     //------------------------------------------------------------------->  this is SYPHON
     mainOutputSyphonServer.publishScreen();
     
     //------------------------------------------------------------------->  this is MY SHAPE
-    /*ofBeginShape();
-    for( int i=0; i<(int)contourFinder.blobs.size(); i++ )
+    if(showShape)
     {
-		//ofNoFill();
-        ofSetHexColor(0x444342);
-		for( int j=0; j<contourFinder.blobs[i].nPts; j++ )
+        for( int i=0; i<(int)contourFinder.blobs.size(); i++ )
         {
-			ofVertex(contourFinder.blobs[i].pts[j].x, 200 + contourFinder.blobs[i].pts[j].y );
+            ofSetHexColor(0xFF0000);
+            ofBeginShape();
+            for( int j=0; j<contourFinder.blobs[i].nPts; j++ )
+            {
+                ofVertex(20 + contourFinder.blobs[i].pts[j].x, 160 + contourFinder.blobs[i].pts[j].y );
+            }
+            ofEndShape();
         }
-		ofEndShape();
-        
-	}*/
+    }
 
     //------------------------------------------------------------------->  this is GUI
     gui.draw();

@@ -37,7 +37,9 @@ class ofApp : public ofBaseApp{
     //------------------------------------------------------------------->  this is GUI
     ofxFloatSlider radius;
     ofxFloatSlider distMax, distMin;
-    ofxButton showMyImage;
+    ofxToggle showImage;
+    ofxToggle showShape;
+    ofxToggle showLines;
     ofxPanel gui;
     //------------------------------------------------------------------->  this is OSC
     ofxOscReceiver receiver;
@@ -69,9 +71,10 @@ class ofApp : public ofBaseApp{
     
     
     ofImage monImage, myBackground;
+    ofImage fond;
     ofFbo fbo;
     ofMesh myMesh;
     int widthOfTheWindow, heightOfTheWindow;
-    bool showGui, showImage;
+    bool showGui;
 		
 };
