@@ -5,7 +5,7 @@ void ofApp::setup(){
     
     widthOfTheWindow  = ofGetWindowWidth();
     heightOfTheWindow = ofGetWindowHeight();
-   
+    
     //-- SYPHON
     mainOutputSyphonServer.setName("boomboomOUT");
     
@@ -21,7 +21,7 @@ void ofApp::setup(){
     //-- Box2d
 	box2d.init();
 	box2d.setGravity(0, 30);
-	box2d.createGround();
+	//box2d.createGround();
 	box2d.setFPS(30.0);
     
     //-- Kinect
@@ -91,10 +91,10 @@ void ofApp::update()
                     ofColor myColor;
 					myColor.set(255, 255, 255);
 					monImage.setColor(i, j, myColor);
-
 				}
 			}
 		}
+        monImage.mirror(false, true);
         monImage.update();
         
         colorImg.setFromPixels(monImage.getPixels(), 640,480);
@@ -127,7 +127,7 @@ void ofApp::update()
                     lines.back().addVertex( 20 + contourFinder.blobs[i].pts[j].x, 160 + contourFinder.blobs[i].pts[j].y );
                 }
                 shared_ptr <ofxBox2dEdge> edge = shared_ptr<ofxBox2dEdge>(new ofxBox2dEdge);
-                lines.back().simplify();
+                lines.back().simplify(1.8);
                 for (int i=0; i<lines.back().size(); i++)
                 {
                     edge.get()->addVertex(lines.back()[i]);
@@ -146,7 +146,7 @@ void ofApp::update()
     {
 		shared_ptr<ofxBox2dCircle> c = shared_ptr<ofxBox2dCircle>(new ofxBox2dCircle);
 		c.get()->setPhysics(0.2, 0.2, 0.002);
-		c.get()->setup(box2d.getWorld(), ofRandom(20, 500), -20, ofRandom(50, 100));
+		c.get()->setup(box2d.getWorld(), ofRandom(20, 640), 140, ofRandom(20, 30));
         c.get()->setVelocity(0, 15); // shoot them down!
 		circles.push_back(c);
 	}
