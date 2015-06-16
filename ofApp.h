@@ -40,11 +40,13 @@ class ofApp : public ofBaseApp{
     ofxFloatSlider distMax, distMin, simplification;
     ofxIntSlider colorRed, colorGreen, colorBlue, holeSizeMin, sizeMin, sizeMax;
     ofxIntSlider randomMax;
+    ofxIntSlider thresholdValue;
     ofxToggle showImage;
     ofxToggle showShape;
     ofxToggle showLines;
     ofxToggle showCircles;
     ofxToggle showItems;
+    ofxToggle produceNewItems;
     ofxToggle blurGray;
     ofxToggle securitySpeed;
     ofxIntSlider blurLevel;

@@ -17,6 +17,7 @@ void ofApp::setup(){
     gui.add(distMin.setup( "distMin", 200, 100, 7500 ));
     gui.add(simplification.setup( "simplification", 1.8, 0.0, 5.0));
     gui.add(holeSizeMin.setup("holeSizeMin", 20,20,600));
+    gui.add(thresholdValue.setup("thresholdValue", 30,0,100));
     gui.add(sizeMin.setup("sizeMin", 20,1,200));
     gui.add(sizeMax.setup("sizeMax", 50,1,200));
     gui.add(randomMax.setup("randomMax", 10,1,50));
@@ -25,6 +26,7 @@ void ofApp::setup(){
     gui.add(showLines.setup("showlines", false));
     gui.add(showCircles.setup("showCircles", false));
     gui.add(showItems.setup("showItems", true));
+    gui.add(produceNewItems.setup("produceNewItems", true));
     gui.add(securitySpeed.setup("securitySpeed", false));
     gui.add(blurGray.setup("blurGray", false));
     gui.add(blurLevel.setup  ( "blurLevel",  10, 0, 50));
@@ -135,7 +137,7 @@ void ofApp::update()
         
 		// take the abs value of the difference between background and incoming and then threshold:
 		grayDiff.absDiff(grayBg, grayImage);
-		grayDiff.threshold(threshold);
+		grayDiff.threshold(thresholdValue);
         
 		// find contours which are between the size of 20 pixels and 1/3 the w*h pixels.
 		// also, find holes is set to true so we will get interior contours as well....
@@ -167,15 +169,18 @@ void ofApp::update()
     }
     //------------------------------------------------------------------->  this is BOX2D
     // add some circles every so often
-	if((int)ofRandom(0, randomMax) == 0)
+    if (produceNewItems)
     {
-		shared_ptr<ofxBox2dCircle> c = shared_ptr<ofxBox2dCircle>(new ofxBox2dCircle);
-		c.get()->setPhysics(0.2, 0.2, 0.002);
-		c.get()->setup(box2d.getWorld(), ofRandom(20, 640), 140, ofRandom(sizeMin, sizeMax));
-        c.get()->setVelocity(0, 15); // shoot them down!
-		circles.push_back(c);
-	}
-	
+        if((int)ofRandom(0, randomMax) == 0)
+        {
+            shared_ptr<ofxBox2dCircle> c = shared_ptr<ofxBox2dCircle>(new ofxBox2dCircle);
+            c.get()->setPhysics(0.2, 0.2, 0.002);
+            c.get()->setup(box2d.getWorld(), ofRandom(20, 640), 140, ofRandom(sizeMin, sizeMax));
+            c.get()->setVelocity(0, 15); // shoot them down!
+            circles.push_back(c);
+        }
+    }
+		
 	box2d.update();
     
     //------------------------------------------------------------------->  this is OSC messager
@@ -325,11 +330,11 @@ void ofApp::draw()
     // finally, a report:
 	ofSetHexColor(0xffffff);
 	stringstream reportStr;
-	reportStr << "bg subtraction and blob detection" << endl
-    << "press ' ' to capture bg" << endl
-    << "threshold " << threshold << " (press: +/-)" << endl
+	reportStr << "kinectDistance min = " << distMin << endl
+    << "kinectDistance max = " << distMax << endl
+    << "threshold " << thresholdValue << endl
     << "num blobs found " << contourFinder.nBlobs << ", fps: " << ofGetFrameRate();
-	ofDrawBitmapString(reportStr.str(), 20, heightOfTheWindow - 50);
+	ofDrawBitmapString(reportStr.str(), 20, heightOfTheWindow - 70);
 
 }
 
