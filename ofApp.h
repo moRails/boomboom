@@ -39,11 +39,15 @@ class ofApp : public ofBaseApp{
     ofxFloatSlider radius;
     ofxFloatSlider distMax, distMin, simplification;
     ofxIntSlider colorRed, colorGreen, colorBlue, holeSizeMin, sizeMin, sizeMax;
+    ofxIntSlider randomMax;
     ofxToggle showImage;
     ofxToggle showShape;
     ofxToggle showLines;
     ofxToggle showCircles;
     ofxToggle showItems;
+    ofxToggle blurGray;
+    ofxToggle securitySpeed;
+    ofxIntSlider blurLevel;
     ofxPanel gui;
     //------------------------------------------------------------------->  this is OSC
     ofxOscReceiver receiver;

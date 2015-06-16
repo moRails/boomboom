@@ -16,14 +16,18 @@ void ofApp::setup(){
     gui.add(distMax.setup( "distMax", 1500, 200, 8000 ));
     gui.add(distMin.setup( "distMin", 200, 100, 7500 ));
     gui.add(simplification.setup( "simplification", 1.8, 0.0, 5.0));
-    gui.add(holeSizeMin.setup("holeSizeMin", 20,20,300));
+    gui.add(holeSizeMin.setup("holeSizeMin", 20,20,600));
     gui.add(sizeMin.setup("sizeMin", 20,1,200));
     gui.add(sizeMax.setup("sizeMax", 50,1,200));
+    gui.add(randomMax.setup("randomMax", 10,1,50));
     gui.add(showShape.setup("showShape", true));
     gui.add(showImage.setup("showImage", false));
     gui.add(showLines.setup("showlines", false));
     gui.add(showCircles.setup("showCircles", false));
     gui.add(showItems.setup("showItems", true));
+    gui.add(securitySpeed.setup("securitySpeed", false));
+    gui.add(blurGray.setup("blurGray", false));
+    gui.add(blurLevel.setup  ( "blurLevel",  10, 0, 50));
     gui.add(colorRed.setup  ( "colorRed",  200, 0, 255));
     gui.add(colorGreen.setup( "colorGreen",  0, 0, 255));
     gui.add(colorBlue.setup ( "colorBlue",   0, 0, 255));
@@ -86,6 +90,12 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::update()
 {
+    if (securitySpeed && ofGetFrameRate() < 20)
+    {
+        lines.clear();
+        edges.clear();
+        circles.clear();
+    }
     //------------------------------------------------------------------->  this is KINECT
     kinect.update();
     if(kinect.isFrameNew())
@@ -118,6 +128,10 @@ void ofApp::update()
         
         colorImg.setFromPixels(monImage.getPixels(), 640,480);
         grayImage = colorImg;
+        if (blurGray)
+        {
+            grayImage.blur(blurLevel);
+        }
         
 		// take the abs value of the difference between background and incoming and then threshold:
 		grayDiff.absDiff(grayBg, grayImage);
@@ -153,7 +167,7 @@ void ofApp::update()
     }
     //------------------------------------------------------------------->  this is BOX2D
     // add some circles every so often
-	if((int)ofRandom(0, 10) == 0)
+	if((int)ofRandom(0, randomMax) == 0)
     {
 		shared_ptr<ofxBox2dCircle> c = shared_ptr<ofxBox2dCircle>(new ofxBox2dCircle);
 		c.get()->setPhysics(0.2, 0.2, 0.002);
