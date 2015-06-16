@@ -17,9 +17,13 @@ void ofApp::setup(){
     gui.add(distMin.setup( "distMin", 200, 100, 7500 ));
     gui.add(simplification.setup( "simplification", 1.8, 0.0, 5.0));
     gui.add(holeSizeMin.setup("holeSizeMin", 20,20,300));
+    gui.add(sizeMin.setup("sizeMin", 20,1,200));
+    gui.add(sizeMax.setup("sizeMax", 50,1,200));
     gui.add(showShape.setup("showShape", true));
     gui.add(showImage.setup("showImage", false));
     gui.add(showLines.setup("showlines", false));
+    gui.add(showCircles.setup("showCircles", false));
+    gui.add(showItems.setup("showItems", true));
     gui.add(colorRed.setup  ( "colorRed",  200, 0, 255));
     gui.add(colorGreen.setup( "colorGreen",  0, 0, 255));
     gui.add(colorBlue.setup ( "colorBlue",   0, 0, 255));
@@ -71,6 +75,7 @@ void ofApp::setup(){
 	threshold = 30;
 
     monImage.loadImage ("monImage.png");
+    myItem.loadImage("item2.png");
     myBackground.loadImage("myBackground.png");
     fond.loadImage("fond.jpg");
     colorImg.setFromPixels(myBackground.getPixels(), 640,480);
@@ -152,7 +157,7 @@ void ofApp::update()
     {
 		shared_ptr<ofxBox2dCircle> c = shared_ptr<ofxBox2dCircle>(new ofxBox2dCircle);
 		c.get()->setPhysics(0.2, 0.2, 0.002);
-		c.get()->setup(box2d.getWorld(), ofRandom(20, 640), 140, ofRandom(20, 30));
+		c.get()->setup(box2d.getWorld(), ofRandom(20, 640), 140, ofRandom(sizeMin, sizeMax));
         c.get()->setVelocity(0, 15); // shoot them down!
 		circles.push_back(c);
 	}
@@ -252,10 +257,23 @@ void ofApp::draw()
 
     //------------------------------------------------------------------->  this is BOX2D
     // some circles :)
-	for (int i=0; i<circles.size(); i++) {
-		ofFill();
-		ofSetHexColor(0xc0dd3b);
-		circles[i].get()->draw();
+	for (int i=0; i<circles.size(); i++)
+    {
+        if (showCircles)
+        {
+            ofFill();
+            ofSetHexColor(0xc0dd3b);
+            circles[i].get()->draw();
+        }
+		if (showItems)
+        {
+            ofPushMatrix();
+            ofTranslate(circles[i]->getPosition().x, circles[i]->getPosition().y, 0);
+            ofRotate(circles[i]->getRotation());
+            myItem.setAnchorPercent(0.5, 0.5);
+            myItem.draw(0, 0,circles[i]->getRadius() * 2, circles[i]->getRadius() *2);
+            ofPopMatrix();
+        }
 	}
     if (showLines)
     {

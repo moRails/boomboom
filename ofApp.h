@@ -38,10 +38,12 @@ class ofApp : public ofBaseApp{
     //------------------------------------------------------------------->  this is GUI
     ofxFloatSlider radius;
     ofxFloatSlider distMax, distMin, simplification;
-    ofxIntSlider colorRed, colorGreen, colorBlue, holeSizeMin;
+    ofxIntSlider colorRed, colorGreen, colorBlue, holeSizeMin, sizeMin, sizeMax;
     ofxToggle showImage;
     ofxToggle showShape;
     ofxToggle showLines;
+    ofxToggle showCircles;
+    ofxToggle showItems;
     ofxPanel gui;
     //------------------------------------------------------------------->  this is OSC
     ofxOscReceiver receiver;
@@ -73,6 +75,7 @@ class ofApp : public ofBaseApp{
     
     
     ofImage monImage, myBackground;
+    ofImage myItem;
     ofImage fond;
     ofFbo fbo;
     ofMesh myMesh;
