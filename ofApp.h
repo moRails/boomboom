@@ -41,11 +41,13 @@ class ofApp : public ofBaseApp{
     ofxIntSlider colorRed, colorGreen, colorBlue, holeSizeMin, sizeMin, sizeMax;
     ofxIntSlider randomMax;
     ofxIntSlider thresholdValue;
+    ofxIntSlider itemNumber;
     ofxToggle showImage;
     ofxToggle showShape;
     ofxToggle showLines;
     ofxToggle showCircles;
     ofxToggle showItems;
+    ofxToggle showBackground;
     ofxToggle produceNewItems;
     ofxToggle blurGray;
     ofxToggle securitySpeed;
@@ -80,12 +82,13 @@ class ofApp : public ofBaseApp{
     bool				bLearnBakground;
     
     
-    ofImage monImage, myBackground;
-    ofImage myItem;
+    ofImage monImage, myBackground;// image vide de reférence - image de départ noir
+    ofImage myItem[10];
     ofImage fond;
     ofFbo fbo;
     ofMesh myMesh;
     int widthOfTheWindow, heightOfTheWindow;
     bool showGui;
+    int randomItem;
 		
 };

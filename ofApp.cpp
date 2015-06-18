@@ -21,11 +21,13 @@ void ofApp::setup(){
     gui.add(sizeMin.setup("sizeMin", 20,1,200));
     gui.add(sizeMax.setup("sizeMax", 50,1,200));
     gui.add(randomMax.setup("randomMax", 10,1,50));
+    gui.add(itemNumber.setup("itemNumber", 1,0,9));
     gui.add(showShape.setup("showShape", true));
     gui.add(showImage.setup("showImage", false));
     gui.add(showLines.setup("showlines", false));
     gui.add(showCircles.setup("showCircles", false));
     gui.add(showItems.setup("showItems", true));
+    gui.add(showBackground.setup("showBackground", true));
     gui.add(produceNewItems.setup("produceNewItems", true));
     gui.add(securitySpeed.setup("securitySpeed", false));
     gui.add(blurGray.setup("blurGray", false));
@@ -81,12 +83,16 @@ void ofApp::setup(){
 	threshold = 30;
 
     monImage.loadImage ("monImage.png");
-    myItem.loadImage("item2.png");
+    //myItem.loadImage("item2.png");
     myBackground.loadImage("myBackground.png");
     fond.loadImage("fond.jpg");
     colorImg.setFromPixels(myBackground.getPixels(), 640,480);
     
     showGui = true;
+    for (int i = 0 ; i < 10; i++)
+    {
+        myItem[i].loadImage("item" + ofToString(i) +".png");
+    }
 }
 
 //--------------------------------------------------------------
@@ -263,7 +269,11 @@ void ofApp::draw()
     kinect.drawDepth(  widthOfTheWindow - (180 *2), 20, 160, 120);
     kinect.draw(       widthOfTheWindow - (180 *2), 160, 160, 120);
     
-    fond.draw(20, 160);
+    if(showBackground)
+    {
+        fond.draw(20, 160);
+    }
+    
     if(showImage)
     {
         fbo.begin();
@@ -278,6 +288,7 @@ void ofApp::draw()
     // some circles :)
 	for (int i=0; i<circles.size(); i++)
     {
+        randomItem = itemNumber;
         if (showCircles)
         {
             ofFill();
@@ -289,8 +300,8 @@ void ofApp::draw()
             ofPushMatrix();
             ofTranslate(circles[i]->getPosition().x, circles[i]->getPosition().y, 0);
             ofRotate(circles[i]->getRotation());
-            myItem.setAnchorPercent(0.5, 0.5);
-            myItem.draw(0, 0,circles[i]->getRadius() * 2, circles[i]->getRadius() *2);
+            myItem[randomItem].setAnchorPercent(0.5, 0.5);
+            myItem[randomItem].draw(0, 0,circles[i]->getRadius() * 2, circles[i]->getRadius() *2);
             ofPopMatrix();
         }
 	}
