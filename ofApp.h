@@ -52,6 +52,7 @@ class ofApp : public ofBaseApp{
     ofxToggle blurGray;
     ofxToggle securitySpeed;
     ofxIntSlider blurLevel;
+    ofxFloatSlider physicsA, physicsB, physicsC;
     ofxPanel gui;
     //------------------------------------------------------------------->  this is OSC
     ofxOscReceiver receiver;

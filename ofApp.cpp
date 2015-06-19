@@ -35,6 +35,9 @@ void ofApp::setup(){
     gui.add(colorRed.setup  ( "colorRed",  200, 0, 255));
     gui.add(colorGreen.setup( "colorGreen",  0, 0, 255));
     gui.add(colorBlue.setup ( "colorBlue",   0, 0, 255));
+    gui.add(physicsA.setup ( "physicsA",   0.2, 0, 2));
+    gui.add(physicsB.setup ( "physicsB",   0.2, 0, 2));
+    gui.add(physicsC.setup ( "physicsC",   0.002, 0, 0.5));
     gui.setPosition(widthOfTheWindow - 220, 300);
     //gui.setWidthElements(340);
     
@@ -180,7 +183,7 @@ void ofApp::update()
         if((int)ofRandom(0, randomMax) == 0)
         {
             shared_ptr<ofxBox2dCircle> c = shared_ptr<ofxBox2dCircle>(new ofxBox2dCircle);
-            c.get()->setPhysics(0.2, 0.2, 0.002);
+            c.get()->setPhysics(physicsA, physicsB, physicsC);
             c.get()->setup(box2d.getWorld(), ofRandom(20, 640), 140, ofRandom(sizeMin, sizeMax));
             c.get()->setVelocity(0, 15); // shoot them down!
             circles.push_back(c);
