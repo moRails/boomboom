@@ -205,7 +205,18 @@ void ofApp::update()
         {
             physicsC = oscValue;
         }
-
+        else if (oscMessage == "/2/itemRandomMin")
+        {
+            itemRandomMin = oscValue;
+        }
+        else if (oscMessage == "/2/itemRandomMax")
+        {
+            itemRandomMax = oscValue;
+        }
+        else if (oscMessage == "/2/clear")
+        {
+            clearAll();
+        }
     }
     
     if (securitySpeed && ofGetFrameRate() < 20)
@@ -482,10 +493,7 @@ void ofApp::keyPressed(int key){
     //------------------------------------------------------------------->  this is BOX2D
     if(key == 'c')
     {
-        lines.clear();
-        edges.clear();
-        circles.clear();
-        itemNumberFall.clear();
+        clearAll();
 	}
     
     switch (key)
@@ -498,6 +506,14 @@ void ofApp::keyPressed(int key){
             showImage =! showImage;
         break;
 	}
+}
+//--------------------------------------------------------------
+void ofApp::clearAll()
+{
+    lines.clear();
+    edges.clear();
+    circles.clear();
+    itemNumberFall.clear();
 }
 
 //--------------------------------------------------------------
