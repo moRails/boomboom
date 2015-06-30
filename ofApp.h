@@ -91,5 +91,6 @@ class ofApp : public ofBaseApp{
     int widthOfTheWindow, heightOfTheWindow;
     bool showGui;
     int randomItem;
-		
+    
+    
 };

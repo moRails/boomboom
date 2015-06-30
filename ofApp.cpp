@@ -101,6 +101,111 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::update()
 {
+    if(oscMessage != "")
+    {
+        if (oscMessage == "/1/distMax")
+        {
+            distMax = oscValue;
+        }
+        else if (oscMessage == "/1/distMin")
+        {
+            distMin = oscValue;
+        }
+        else if (oscMessage == "/1/simplification")
+        {
+            simplification = oscValue;
+        }
+        else if (oscMessage == "/1/holeSizeMin")
+        {
+            holeSizeMin = oscValue;
+        }
+        else if (oscMessage == "/1/thresholdValue")
+        {
+            thresholdValue = oscValue;
+        }
+        else if (oscMessage == "/1/sizeMin")
+        {
+            sizeMin = oscValue;
+        }
+        else if (oscMessage == "/1/sizeMax")
+        {
+            sizeMax = oscValue;
+        }
+        else if (oscMessage == "/1/randomMax")
+        {
+            randomMax = oscValue;
+        }
+        else if (oscMessage == "/1/itemNumber")
+        {
+            itemNumber = oscValue;
+        }
+        else if (oscMessage == "/1/showShape")
+        {
+            showShape = oscValue;
+        }
+        else if (oscMessage == "/1/showImage")
+        {
+            showImage = oscValue;
+        }
+        else if (oscMessage == "/1/showlines")
+        {
+            showLines = oscValue;
+        }
+        else if (oscMessage == "/1/showCircles")
+        {
+            showCircles = oscValue;
+        }
+        else if (oscMessage == "/1/showItems")
+        {
+            showItems = oscValue;
+        }
+        else if (oscMessage == "/1/showBackground")
+        {
+            showBackground = oscValue;
+        }
+        else if (oscMessage == "/1/produceNewItems")
+        {
+            produceNewItems = oscValue;
+        }
+        else if (oscMessage == "/1/securitySpeed")
+        {
+            securitySpeed = oscValue;
+        }
+        else if (oscMessage == "/2/blurGray")
+        {
+            blurGray = oscValue;
+        }
+        else if (oscMessage == "/2/blurLevel")
+        {
+            blurLevel = oscValue;
+        }
+        else if (oscMessage == "/2/colorRed")
+        {
+            colorRed = oscValue;
+        }
+        else if (oscMessage == "/2/colorGreen")
+        {
+            colorGreen = oscValue;
+        }
+        else if (oscMessage == "/2/colorBlue")
+        {
+            colorBlue = oscValue;
+        }
+        else if (oscMessage == "/2/physicsA")
+        {
+            physicsA = oscValue;
+        }
+        else if (oscMessage == "/2/physicsB")
+        {
+            physicsB = oscValue;
+        }
+        else if (oscMessage == "/2/physicsC")
+        {
+            physicsC = oscValue;
+        }
+
+    }
+    
     if (securitySpeed && ofGetFrameRate() < 20)
     {
         lines.clear();
