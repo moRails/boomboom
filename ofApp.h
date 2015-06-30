@@ -42,6 +42,7 @@ class ofApp : public ofBaseApp{
     ofxIntSlider randomMax;
     ofxIntSlider thresholdValue;
     ofxIntSlider itemNumber;
+    ofxIntSlider itemRandomMin, itemRandomMax;
     ofxToggle showImage;
     ofxToggle showShape;
     ofxToggle showLines;
@@ -84,13 +85,15 @@ class ofApp : public ofBaseApp{
     
     
     ofImage monImage, myBackground;// image vide de reférence - image de départ noir
-    ofImage myItem[10];
+    int totalItems;
+    ofImage myItem[28];
     ofImage fond;
     ofFbo fbo;
     ofMesh myMesh;
     int widthOfTheWindow, heightOfTheWindow;
     bool showGui;
     int randomItem;
+    vector<int> itemNumberFall;
     
     
 };

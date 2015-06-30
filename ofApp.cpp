@@ -6,7 +6,7 @@ void ofApp::setup(){
     ofBackground(0, 0, 0);
     widthOfTheWindow  = ofGetWindowWidth();
     heightOfTheWindow = ofGetWindowHeight();
-    
+    totalItems = 28;
     //-- SYPHON
     mainOutputSyphonServer.setName("boomboomOUT");
     toProject.setName("justWhatWeNeed");
@@ -22,6 +22,8 @@ void ofApp::setup(){
     gui.add(sizeMax.setup("sizeMax", 50,1,200));
     gui.add(randomMax.setup("randomMax", 10,1,50));
     gui.add(itemNumber.setup("itemNumber", 1,0,9));
+    gui.add(itemRandomMin.setup("itemRandomMin", 1,0,27));
+    gui.add(itemRandomMax.setup("itemRandomMax", 1,0,27));
     gui.add(showShape.setup("showShape", true));
     gui.add(showImage.setup("showImage", false));
     gui.add(showLines.setup("showlines", false));
@@ -38,7 +40,7 @@ void ofApp::setup(){
     gui.add(physicsA.setup ( "physicsA",   0.2, 0, 2));
     gui.add(physicsB.setup ( "physicsB",   0.2, 0, 2));
     gui.add(physicsC.setup ( "physicsC",   0.002, 0, 0.5));
-    gui.setPosition(widthOfTheWindow - 220, 300);
+    gui.setPosition(widthOfTheWindow - 390, 20);
     //gui.setWidthElements(340);
     
     //-- OSC
@@ -92,7 +94,7 @@ void ofApp::setup(){
     colorImg.setFromPixels(myBackground.getPixels(), 640,480);
     
     showGui = true;
-    for (int i = 0 ; i < 10; i++)
+    for (int i = 0 ; i < totalItems; i++)
     {
         myItem[i].loadImage("item" + ofToString(i) +".png");
     }
@@ -292,6 +294,8 @@ void ofApp::update()
             c.get()->setup(box2d.getWorld(), ofRandom(20, 640), 140, ofRandom(sizeMin, sizeMax));
             c.get()->setVelocity(0, 15); // shoot them down!
             circles.push_back(c);
+            randomItem = (int) ofRandom(itemRandomMin, itemRandomMax);
+            itemNumberFall.push_back(randomItem);
         }
     }
 		
@@ -363,19 +367,22 @@ void ofApp::update()
 //--------------------------------------------------------------
 void ofApp::draw()
 {
-    ofSetColor(50);
+    ofSetColor(200,0,0);
     ofFill();
     ofRect(widthOfTheWindow - 400, 0, widthOfTheWindow, heightOfTheWindow);
     ofSetColor(255);
     //------------------------------------------------------------------->  this is OPEN CV
-	grayBg.draw(       widthOfTheWindow - 180, 20, 160, 120);
-	grayDiff.draw(     widthOfTheWindow - 180, 160,160, 120);
+	//grayBg.draw(       widthOfTheWindow - 180, 20, 160, 120);
+    ofSetColor(0);ofFill();
+    ofRect(widthOfTheWindow - 180, 20, 160, 120);
+    ofSetColor(255);
     contourFinder.draw(widthOfTheWindow - 180, 20, 160, 120);
+	grayDiff.draw(     widthOfTheWindow - 180, 160,160, 120);
     
     //------------------------------------------------------------------->  this is KINECT
     // draw from the live kinect
-    kinect.drawDepth(  widthOfTheWindow - (180 *2), 20, 160, 120);
-    kinect.draw(       widthOfTheWindow - (180 *2), 160, 160, 120);
+    kinect.drawDepth(  widthOfTheWindow - 180, 300, 160, 120);
+    kinect.draw(       widthOfTheWindow - 180, 440, 160, 120);
     
     if(showBackground)
     {
@@ -396,7 +403,8 @@ void ofApp::draw()
     // some circles :)
 	for (int i=0; i<circles.size(); i++)
     {
-        randomItem = itemNumber;
+        //randomItem = itemNumber;
+        
         if (showCircles)
         {
             ofFill();
@@ -408,8 +416,8 @@ void ofApp::draw()
             ofPushMatrix();
             ofTranslate(circles[i]->getPosition().x, circles[i]->getPosition().y, 0);
             ofRotate(circles[i]->getRotation());
-            myItem[randomItem].setAnchorPercent(0.5, 0.5);
-            myItem[randomItem].draw(0, 0,circles[i]->getRadius() * 2, circles[i]->getRadius() *2);
+            myItem[itemNumberFall[i]].setAnchorPercent(0.5, 0.5);
+            myItem[itemNumberFall[i]].draw(0, 0,circles[i]->getRadius() * 2, circles[i]->getRadius() *2);
             ofPopMatrix();
         }
 	}
@@ -477,6 +485,7 @@ void ofApp::keyPressed(int key){
         lines.clear();
         edges.clear();
         circles.clear();
+        itemNumberFall.clear();
 	}
     
     switch (key)
